@@ -1,0 +1,28 @@
+@keyframes mymove {
+  0% {
+    background-color: rgb(255, 255, 255);
+  }
+
+  50% {
+    background-color: rgb(148, 237, 243);
+  }
+
+  100% {
+    background-color: rgb(255, 255, 255);
+  }
+}
+
+body {
+  margin: 0;
+  animation: mymove 60s infinite;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
