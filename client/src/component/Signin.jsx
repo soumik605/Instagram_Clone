@@ -10,7 +10,9 @@ import {
 } from "@material-ui/core";
 import M from "materialize-css";
 import { useHistory } from "react-router-dom";
-import {userContext} from '../App'
+import { userContext } from "../App";
+import { useAlert } from 'react-alert'
+
 
 const useStyle = makeStyles({
   container: {
@@ -24,11 +26,12 @@ const useStyle = makeStyles({
 });
 
 const Signin = () => {
-  const {dispatch} = useContext(userContext)
+  const { dispatch } = useContext(userContext);
   const classes = useStyle();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const history = useHistory();
+  const alert = useAlert();
 
   const addUserDetails = () => {
     fetch("/signin", {
@@ -43,15 +46,15 @@ const Signin = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
+        console.log(data);
         if (data.error) {
-          M.toast({ html: data.error, classes: "#c62828 red darken-3" });
-          
+          alert.error(data.error);
         } else {
-          localStorage.setItem("jwt",data.token)
-          localStorage.setItem("user",JSON.stringify(data.user))
-          dispatch({type:"USER", payload:data.user})
-          M.toast({ html: "Login Successfully", classes: "#43a047 green darken-1" });
+          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          dispatch({ type: "USER", payload: data.user });
+          
+          alert.success("Login Successful");
           history.push("/");
         }
       });
@@ -84,6 +87,7 @@ const Signin = () => {
       >
         Login
       </Button>
+      
     </FormGroup>
   );
 };

@@ -3,12 +3,15 @@ const mongoose = require("mongoose");
 const { MONGOURI } = require("./config/keys");
 const app = express();
 const PORT = process.env.PORT || 5000;
+//const PORT = 5000;
+
 
 mongoose
   .connect(MONGOURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
+    useCreateIndex:true,
   })
   .then(() => {
     console.log("Connected To Database");

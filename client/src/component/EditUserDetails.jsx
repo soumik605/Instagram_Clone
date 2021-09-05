@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -8,10 +8,9 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import M from "materialize-css";
 import { useHistory } from "react-router-dom";
-import { useAlert } from 'react-alert'
-
+import { useAlert } from "react-alert";
+import { userContext } from "../App";
 
 const useStyle = makeStyles({
   container: {
@@ -24,41 +23,49 @@ const useStyle = makeStyles({
   },
 });
 
-const Signup = () => {
+const EditUserDetails = () => {
   const classes = useStyle();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const history = useHistory();
   const alert = useAlert();
+  const { state, dispatch } = useContext(userContext);
 
-
-  const addUserDetails = () => {
-    fetch("/signup", {
-      method: "post",
+  const editUser = () => {
+    fetch("/edituserdetails", {
+      method: "put",
       headers: {
         "content-type": "application/json",
+        authorization: "Bearer " + localStorage.getItem("jwt"),
       },
       body: JSON.stringify({
+        _id: state._id,
         name,
         email,
-        password,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.error) {
-          alert.error(data.error)
-        } else {
-          alert.success("New account created")
-          history.push("/signin");
-        }
+        console.log(data)
+        dispatch({
+          type: "USER",
+          payload: data,
+        });
+        localStorage.setItem("user", JSON.stringify(data));
+        history.push("/profile")
       });
   };
 
+  useEffect(() => {
+    if (state) {
+      setName(state.name);
+      setEmail(state.email);
+    }
+  }, [state]);
+
   return (
     <FormGroup className={classes.container}>
-      <Typography variant="h4">Add User</Typography>
+      <Typography variant="h4">Update User</Typography>
       <FormControl>
         <InputLabel>Name</InputLabel>
         <Input
@@ -75,24 +82,13 @@ const Signup = () => {
           value={email}
         />
       </FormControl>
-      <FormControl>
-        <InputLabel>Password</InputLabel>
-        <Input
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          name="password"
-          value={password}
-        />
-      </FormControl>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => addUserDetails()}
-      >
-        Add User
-      </Button>
+      {state && (
+        <Button variant="contained" color="primary" onClick={() => editUser()}>
+          Update User
+        </Button>
+      )}
     </FormGroup>
   );
 };
 
-export default Signup;
+export default EditUserDetails;

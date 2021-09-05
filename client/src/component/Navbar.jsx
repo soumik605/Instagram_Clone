@@ -45,9 +45,12 @@ const Navbar = () => {
       ];
     } else {
       return [
-        <NavLink key="profile" className={classes.tabs} to="/profile" exact>
-          Profile
+        <NavLink key="explore" className={classes.tabs} to="/explore" exact>
+          Explore
         </NavLink>,
+        <NavLink key="profile" className={classes.tabs} to="/profile" exact>
+        Profile
+      </NavLink>,
         <NavLink key="createpost" className={classes.tabs} to="/createpost" exact>
           Create Post
         </NavLink>,

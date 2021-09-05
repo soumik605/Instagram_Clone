@@ -13,10 +13,11 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type: String,
-        required: true
+        required: true,
+        min:4
     },
-    followers:[{ type:ObjectId, ref:"User"}],
-    followings:[{ type:ObjectId, ref:"User"}],
+    followers:[{ type:ObjectId,unique:true, ref:"User"}],
+    followings:[{ type:ObjectId,unique:true, ref:"User"}],
 })
 
 

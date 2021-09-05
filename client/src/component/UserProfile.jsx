@@ -6,7 +6,9 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import ImageList from "@material-ui/core/ImageList";
 import ImageListItem from "@material-ui/core/ImageListItem";
 import { userContext } from "../App";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import "../CSS/PopStyle.css";
+import { useAlert } from "react-alert";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,22 +42,34 @@ const UserProfile = () => {
   const classes = useStyles();
   const [data, setData] = useState(null);
   const { state, dispatch } = useContext(userContext);
+  const [isOpen, setIsOpen] = useState(false);
+  const [followersList, setFollowersList] = useState([]);
+  const [followingsList, setFollowingsList] = useState([]);
   const { userid } = useParams();
+  const alert = useAlert();
 
   useEffect(() => {
-    console.log(userid);
     fetch(`/user/${userid}`, {
       headers: {
         authorization: "Bearer " + localStorage.getItem("jwt"),
       },
     })
       .then((res) => res.json())
-      .then((result) => {
-        setData(result);
-      });
-  }, []);
+      .then((res) => {
+        setData(res);
+        const followlist = res.user.followers.map((person) => {
+          return person;
+        });
+        setFollowersList(followlist);
 
-  const followUser = () => {
+        const followlist2 = res.user.followings.map((person) => {
+          return person;
+        });
+        setFollowingsList(followlist2);
+      });
+  }, [state]);
+
+  const followUser = (userid) => {
     fetch("/follow", {
       method: "put",
       headers: {
@@ -68,8 +82,6 @@ const UserProfile = () => {
     })
       .then((resp) => resp.json())
       .then((res) => {
-        console.log(res.result);
-        console.log(res.result1);
         dispatch({
           type: "UPDATE",
           payload: {
@@ -79,10 +91,11 @@ const UserProfile = () => {
         });
         localStorage.setItem("user", JSON.stringify(res.result));
         setData({ ...data, user: res.result1 });
+        alert.show("You are now following " + res.result1.name);
       });
   };
 
-  const unfollowUser = () => {
+  const unfollowUser = (userid) => {
     fetch("/unfollow", {
       method: "put",
       headers: {
@@ -95,8 +108,6 @@ const UserProfile = () => {
     })
       .then((resp) => resp.json())
       .then((res) => {
-        console.log(res.result);
-        console.log(res.result1);
         dispatch({
           type: "UPDATE",
           payload: {
@@ -106,7 +117,12 @@ const UserProfile = () => {
         });
         localStorage.setItem("user", JSON.stringify(res.result));
         setData({ ...data, user: res.result1 });
+        alert.show("You just unfollow " + res.result1.name);
       });
+  };
+
+  const togglePopup = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
@@ -114,39 +130,114 @@ const UserProfile = () => {
       {data ? (
         <div className={classes.root}>
           <div className={classes.mydetails}>
-            <Avatar alt="SRemy Sharp" src="/static/images/avatar/1.jpg" />
+            <Avatar alt={data.user.name} src="/static/images/avatar/1.jpg" />
             <h1>{data ? data.user.name : "loading.."}</h1>
-            <h3 style={{fontFamily:'Dancing Script'}}>{data ? data.user.email : "loading.."}</h3>
+            <h3 style={{ fontFamily: "Dancing Script" }}>
+              {data ? data.user.email : "loading.."}
+            </h3>
             <ButtonGroup
               variant="text"
               color="primary"
               aria-label="text primary button group"
             >
               <Button>Posts : {data.posts.length}</Button>
-              <Button>Followers : {data.user.followers.length}</Button>
-              <Button>Following : {data.user.followings.length}</Button>
+              <Button onClick={() => togglePopup()}>
+                Followers : {data.user.followers.length}
+              </Button>
+              <Button onClick={() => togglePopup()}>
+                Following : {data.user.followings.length}
+              </Button>
+              {isOpen && (
+                <div className="popup-box">
+                  <div className="box">
+                    <span className="close-icon" onClick={() => togglePopup()}>
+                      x
+                    </span>
+                    <div>
+                      <b>Followers List</b>
+                      <ol>
+                        {followersList &&
+                          followersList.map((user) => (
+                            <li key={user._id} style={{ margin: "10px" }}>
+                              <Link
+                                to={`/profile/${user._id}`}
+                                style={{ textDecoration: "none" }}
+                              >
+                                {user.name}
+                              </Link>
+                              {state._id == user._id ? (
+                                <Link
+                                to={`/profile`}
+                                style={{ textDecoration: "none", float:"right" }}
+                              >
+                                Your Profile
+                              </Link>
+                              ) : state.followings.includes(user._id) ? (
+                                <Button
+                                  style={{ float: "right", fontSize: "10px" }}
+                                  onClick={() => unfollowUser(user._id)}
+                                >
+                                  Unfollow
+                                </Button>
+                              ) : (
+                                <Button
+                                  style={{ float: "right", fontSize: "10px" }}
+                                  onClick={() => followUser(user._id)}
+                                >
+                                  Follow
+                                </Button>
+                              )}
+                            </li>
+                          ))}
+                      </ol>
+                      <b>Followings List</b>
+                      <ol>
+                        {followingsList &&
+                          followingsList.map((user) => (
+                            <li key={user._id} style={{ margin: "10px" }}>
+                              <Link
+                                to={`/profile/${user._id}`}
+                                style={{ textDecoration: "none" }}
+                              >
+                                {user.name}
+                              </Link>
+                              {state.followings.includes(user._id) ? (
+                                <Button
+                                  style={{ float: "right", fontSize: "10px" }}
+                                  onClick={() => unfollowUser(user._id)}
+                                >
+                                  Unfollow
+                                </Button>
+                              ) : (
+                                <Button
+                                  style={{ float: "right", fontSize: "10px" }}
+                                  onClick={() => followUser(user._id)}
+                                >
+                                  Follow
+                                </Button>
+                              )}
+                            </li>
+                          ))}
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              )}
             </ButtonGroup>
-            {data.user.followers.includes(state._id) ? (
+
+            {state.followings.includes(data.user._id) ? (
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => unfollowUser()}
+                onClick={() => unfollowUser(userid)}
               >
                 Unfollow
-              </Button>
-            ) : state.followers.includes(data.user._id) ? (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => followUser()}
-              >
-                Follow Back
               </Button>
             ) : (
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => followUser()}
+                onClick={() => followUser(userid)}
               >
                 Follow
               </Button>

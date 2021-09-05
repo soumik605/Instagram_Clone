@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
+  Card,
   FormControl,
   FormGroup,
   Input,
   InputLabel,
   makeStyles,
   Typography,
+  CardMedia,
 } from "@material-ui/core";
 import M from "materialize-css";
 import { useHistory } from "react-router-dom";
+import { useAlert } from "react-alert";
 
 const useStyle = makeStyles({
   container: {
@@ -29,6 +32,7 @@ const CreatePost = () => {
   const [img, setImg] = useState("");
   const [url, setUrl] = useState("");
   const history = useHistory();
+  const alert = useAlert();
 
   useEffect(() => {
     if (url) {
@@ -47,12 +51,9 @@ const CreatePost = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.error) {
-            M.toast({ html: data.error, classes: "#c62828 red darken-3" });
+            alert.error("Sorry, Something went wrong !!");
           } else {
-            M.toast({
-              html: "Post Created",
-              classes: "#43a047 green darken-1",
-            });
+            alert.success("Successfully Posted !!");
             history.push("/");
           }
         });
@@ -88,7 +89,7 @@ const CreatePost = () => {
         />
       </FormControl>
       <FormControl>
-        <InputLabel>Descrition</InputLabel>
+        <InputLabel>Description</InputLabel>
         <Input
           onChange={(e) => setDesc(e.target.value)}
           name="desc"

@@ -12,8 +12,8 @@ import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Link, useHistory } from "react-router-dom";
+import { Button } from "@material-ui/core";
 
-import Button from "@material-ui/core/Button";
 import { useAlert } from "react-alert";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,9 +41,10 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     justifyContent: "center",
   },
+  cmntlike: { fontSize: "15px", paddingLeft: "20px" },
 }));
 
-export default function Home() {
+export default function Explore() {
   const classes = useStyles();
   const history = useHistory();
   const [data, setData] = useState([]);
@@ -52,7 +53,7 @@ export default function Home() {
   const alert = useAlert();
 
   useEffect(() => {
-    fetch("/allsubpost", {
+    fetch("/allpost", {
       headers: {
         authorization: "Bearer " + localStorage.getItem("jwt"),
       },
@@ -71,11 +72,8 @@ export default function Home() {
     })
       .then((res) => res.json())
       .then((res) => {
-        const list = res.result;
-        if (list) {
-          list.sort(() => Math.random() - 0.5);
-        }
-
+        let list = res.result;
+        list = list.sort(() => Math.random() - 0.5);
         setAlluser(list);
       });
   }, []);
@@ -229,7 +227,6 @@ export default function Home() {
     })
       .then((resp) => resp.json())
       .then((result) => {
-        console.log(result.message);
         const newData = data.filter((res) => {
           if (res._id !== result.message._id) {
             return res;
@@ -271,14 +268,14 @@ export default function Home() {
         style={{ whiteSpace: "nowrap", overflow: "auto", marginTop: "30px" }}
       >
         <div style={{ display: "inline-block" }}>
-        <h4>Suggestions</h4>
+          <h4>Suggestions</h4>
           {alluser.map((user) => {
             return (
               state._id !== user._id && (
                 <Card className={classes.usercard} key={user._id}>
                   <CardContent style={{ textAlign: "center" }}>
                     <Avatar
-                      alt={user.name}
+                      alt="SRemy Sharp"
                       src="/static/images/avatar/1.jpg"
                       style={{ margin: "auto" }}
                     />
@@ -342,6 +339,21 @@ export default function Home() {
               }
               subheader={posttime}
             />
+            {state.followings.includes(item.postedBy._id) ? (
+              <Button
+                style={{ float: "right" }}
+                onClick={() => unfollowUser(item.postedBy)}
+              >
+                Following
+              </Button>
+            ) : (
+              <Button
+                style={{ float: "right" }}
+                onClick={() => followUser(item.postedBy)}
+              >
+                Follow
+              </Button>
+            )}
 
             <CardContent>
               {item.postedBy._id === state._id && (
@@ -377,6 +389,7 @@ export default function Home() {
                     {comment.postedBy.name} -{" "}
                   </span>
                   <span>{comment.text}</span>
+
                   <span>
                     {comment.postedBy._id === state._id && (
                       <DeleteIcon

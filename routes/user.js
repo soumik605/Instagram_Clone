@@ -8,9 +8,21 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config/keys");
 const requireLogin = require("../middleware/requireLogin");
 
+router.get("/alluser", requireLogin, (req, res) => {
+  User.find()
+    .then((result) => {
+      res.json({ result });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
 router.get("/user/:userid", requireLogin, (req, res) => {
   User.findOne({ _id: req.params.userid })
     .select("-password")
+    .populate("followers","_id name email")
+    .populate("followings","_id name email")
     .then((user) => {
       Post.find({ postedBy: req.params.userid })
         .populate("postedBy", "_id name")
@@ -90,5 +102,32 @@ router.put("/unfollow", requireLogin, (req, res) => {
     }
   );
 });
+
+router.put("/edituserdetails", requireLogin, (req, res) => {
+  const { _id, name, email } = req.body;
+
+  if (!email || !name) {
+    return res.status(422).json({ error: "Please add all fields" });
+  } else {
+    User.findByIdAndUpdate(
+      _id,
+      {
+        name,
+        email,
+      },
+      {
+        new: true,
+      }
+    )
+      .then((user) => {
+        console.log(user);
+        res.send(user);
+      })
+      .catch((err) => {
+        return res.status(422).json({ error: err });
+      });
+  }
+});
+
 
 module.exports = router;

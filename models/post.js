@@ -24,6 +24,12 @@ const postSchema = new mongoose.Schema({
     {
       text: String,
       postedBy: { type: ObjectId, ref: "User" },
+      clikes:[
+        {
+          type: ObjectId,
+          ref: "User",
+        },
+      ]
     },
   ],
   postedBy: {

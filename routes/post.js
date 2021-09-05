@@ -45,8 +45,9 @@ router.get("/allpost", requireLogin, (req, res) => {
 
 router.get("/allsubpost", requireLogin, (req, res) => {
   Post.find({ postedBy: { $in: req.user.followings } })
-    .populate("postedBy", "_id name email")
+    .populate("postedBy", "_id name email followers followings")
     .populate("comments.postedBy", "_id name")
+    .sort("-createdAt")
     .then((result) => {
       res.json({ result });
     })
@@ -141,10 +142,9 @@ router.delete("/delete/:postId", requireLogin, (req, res) => {
         return res.status(422).json({ error: err });
       }
       if (req.user._id.toString() === post.postedBy._id.toString()) {
-        console.log("post deleted");
         post
           .remove()
-          .then((resp) => res.json({ message: resp }))
+          .then((resp) => res.json({ resp }))
           .catch((err) => console.log(err));
       }
     });
