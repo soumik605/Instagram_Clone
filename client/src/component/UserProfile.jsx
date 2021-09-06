@@ -201,7 +201,14 @@ const UserProfile = () => {
                               >
                                 {user.name}
                               </Link>
-                              {state.followings.includes(user._id) ? (
+                              {state._id == user._id ? (
+                                <Link
+                                to={`/profile`}
+                                style={{ textDecoration: "none", float:"right" }}
+                              >
+                                Your Profile
+                              </Link>
+                              ) : state.followings.includes(user._id) ? (
                                 <Button
                                   style={{ float: "right", fontSize: "10px" }}
                                   onClick={() => unfollowUser(user._id)}
