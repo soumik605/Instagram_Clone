@@ -9,6 +9,7 @@ import { userContext } from "../App";
 import { useParams, Link } from "react-router-dom";
 import "../CSS/PopStyle.css";
 import { useAlert } from "react-alert";
+import "../CSS/loadingStyle.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -126,9 +127,9 @@ const UserProfile = () => {
   };
 
   return (
-    <>
+    <div className={classes.root}>
       {data ? (
-        <div className={classes.root}>
+        <>
           <div className={classes.mydetails}>
             <Avatar alt={data.user.name} src="/static/images/avatar/1.jpg" />
             <h1>{data ? data.user.name : "loading.."}</h1>
@@ -147,7 +148,28 @@ const UserProfile = () => {
               <Button onClick={() => togglePopup()}>
                 Following : {data.user.followings.length}
               </Button>
-              {isOpen && (
+              
+            </ButtonGroup>
+
+            {state.followings.includes(data.user._id) ? (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => unfollowUser(userid)}
+              >
+                Unfollow
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => followUser(userid)}
+              >
+                Follow
+              </Button>
+            )}
+          </div>
+          {isOpen && (
                 <div className="popup-box">
                   <div className="box">
                     <span className="close-icon" onClick={() => togglePopup()}>
@@ -167,11 +189,14 @@ const UserProfile = () => {
                               </Link>
                               {state._id == user._id ? (
                                 <Link
-                                to={`/profile`}
-                                style={{ textDecoration: "none", float:"right" }}
-                              >
-                                Your Profile
-                              </Link>
+                                  to={`/profile`}
+                                  style={{
+                                    textDecoration: "none",
+                                    float: "right",
+                                  }}
+                                >
+                                  Your Profile
+                                </Link>
                               ) : state.followings.includes(user._id) ? (
                                 <Button
                                   style={{ float: "right", fontSize: "10px" }}
@@ -203,11 +228,14 @@ const UserProfile = () => {
                               </Link>
                               {state._id == user._id ? (
                                 <Link
-                                to={`/profile`}
-                                style={{ textDecoration: "none", float:"right" }}
-                              >
-                                Your Profile
-                              </Link>
+                                  to={`/profile`}
+                                  style={{
+                                    textDecoration: "none",
+                                    float: "right",
+                                  }}
+                                >
+                                  Your Profile
+                                </Link>
                               ) : state.followings.includes(user._id) ? (
                                 <Button
                                   style={{ float: "right", fontSize: "10px" }}
@@ -230,27 +258,6 @@ const UserProfile = () => {
                   </div>
                 </div>
               )}
-            </ButtonGroup>
-
-            {state.followings.includes(data.user._id) ? (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => unfollowUser(userid)}
-              >
-                Unfollow
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => followUser(userid)}
-              >
-                Follow
-              </Button>
-            )}
-          </div>
-
           <div className={classes.photo}>
             <ImageList rowHeight={160} className={classes.imageList} cols={3}>
               {data.posts.map((item) => (
@@ -260,14 +267,11 @@ const UserProfile = () => {
               ))}
             </ImageList>
           </div>
-        </div>
+        </>
       ) : (
-        <h1>
-          <br />
-          Loading...
-        </h1>
+        <div class="loader"></div>
       )}
-    </>
+    </div>
   );
 };
 

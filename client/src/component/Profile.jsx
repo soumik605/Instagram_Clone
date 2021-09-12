@@ -136,107 +136,116 @@ const Profile = () => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.mydetails}>
-        <Avatar alt={state && state.name} src="/static/images/avatar/1.jpg" />
-        <Link style={{ float: "right" }} to="/edituser">
-          <EditIcon />
-        </Link>
-        <h1>{state ? state.name : "loading.."}</h1>
-        <h3 style={{ fontFamily: "Dancing Script" }}>
-          {state ? state.email : "loading.."}
-        </h3>
-        <ButtonGroup
-          variant="text"
-          color="primary"
-          aria-label="text primary button group"
-        >
-          <Button>Posts : {data.length}</Button>
-          <Button onClick={() => togglePopup()}>
-            Followers : {state ? state.followers.length : "Loading.."}
-          </Button>
-          <Button onClick={() => togglePopup()}>
-            Following : {state ? state.followings.length : "Loading.."}
-          </Button>
-        </ButtonGroup>
-      </div>
-      {isOpen && (
-        <div className="popup-box">
-          <div className="box">
-            <span className="close-icon" onClick={() => togglePopup()}>
-              x
-            </span>
-            <div>
-              <b>Followers List</b>
-              <ol>
-                {followersList &&
-                  followersList.map((user) => (
-                    <li key={user._id} style={{ margin: "10px" }}>
-                      <Link
-                        to={`/profile/${user._id}`}
-                        style={{ textDecoration: "none" }}
-                      >
-                        {user.name}
-                      </Link>
-                      {state.followings.includes(user._id) ? (
-                        <Button
-                          style={{ float: "right", fontSize: "10px" }}
-                          onClick={() => unfollowUser(user._id)}
-                        >
-                          Unfollow
-                        </Button>
-                      ) : (
-                        <Button
-                          style={{ float: "right", fontSize: "10px" }}
-                          onClick={() => followUser(user._id)}
-                        >
-                          Follow Back
-                        </Button>
-                      )}
-                    </li>
-                  ))}
-              </ol>
-              <b>Followings List</b>
-              <ol>
-                {followingsList &&
-                  followingsList.map((user) => (
-                    <li key={user._id} style={{ margin: "10px" }}>
-                      <Link
-                        to={`/profile/${user._id}`}
-                        style={{ textDecoration: "none" }}
-                      >
-                        {user.name}
-                      </Link>
-                      {state.followings.includes(user._id) ? (
-                        <Button
-                          style={{ float: "right", fontSize: "10px" }}
-                          onClick={() => unfollowUser(user._id)}
-                        >
-                          Unfollow
-                        </Button>
-                      ) : (
-                        <Button
-                          style={{ float: "right", fontSize: "10px" }}
-                          onClick={() => followUser(user._id)}
-                        >
-                          Follow
-                        </Button>
-                      )}
-                    </li>
-                  ))}
-              </ol>
-            </div>
+      {state ? (
+        <>
+          <div className={classes.mydetails}>
+            <Avatar
+              alt={state && state.name}
+              src="/static/images/avatar/1.jpg"
+            />
+            <Link style={{ float: "right" }} to="/edituser">
+              <EditIcon />
+            </Link>
+            <h1>{state ? state.name : "loading.."}</h1>
+            <h3 style={{ fontFamily: "Dancing Script" }}>
+              {state ? state.email : "loading.."}
+            </h3>
+            <ButtonGroup
+              variant="text"
+              color="primary"
+              aria-label="text primary button group"
+            >
+              <Button>Posts : {data.length}</Button>
+              <Button onClick={() => togglePopup()}>
+                Followers : {state ? state.followers.length : "Loading.."}
+              </Button>
+              <Button onClick={() => togglePopup()}>
+                Following : {state ? state.followings.length : "Loading.."}
+              </Button>
+            </ButtonGroup>
           </div>
-        </div>
+          {isOpen && (
+            <div className="popup-box">
+              <div className="box">
+                <span className="close-icon" onClick={() => togglePopup()}>
+                  x
+                </span>
+                <div>
+                  <b>Followers List</b>
+                  <ol>
+                    {followersList &&
+                      followersList.map((user) => (
+                        <li key={user._id} style={{ margin: "10px" }}>
+                          <Link
+                            to={`/profile/${user._id}`}
+                            style={{ textDecoration: "none" }}
+                          >
+                            {user.name}
+                          </Link>
+                          {state.followings.includes(user._id) ? (
+                            <Button
+                              style={{ float: "right", fontSize: "10px" }}
+                              onClick={() => unfollowUser(user._id)}
+                            >
+                              Unfollow
+                            </Button>
+                          ) : (
+                            <Button
+                              style={{ float: "right", fontSize: "10px" }}
+                              onClick={() => followUser(user._id)}
+                            >
+                              Follow Back
+                            </Button>
+                          )}
+                        </li>
+                      ))}
+                  </ol>
+                  <b>Followings List</b>
+                  <ol>
+                    {followingsList &&
+                      followingsList.map((user) => (
+                        <li key={user._id} style={{ margin: "10px" }}>
+                          <Link
+                            to={`/profile/${user._id}`}
+                            style={{ textDecoration: "none" }}
+                          >
+                            {user.name}
+                          </Link>
+                          {state.followings.includes(user._id) ? (
+                            <Button
+                              style={{ float: "right", fontSize: "10px" }}
+                              onClick={() => unfollowUser(user._id)}
+                            >
+                              Unfollow
+                            </Button>
+                          ) : (
+                            <Button
+                              style={{ float: "right", fontSize: "10px" }}
+                              onClick={() => followUser(user._id)}
+                            >
+                              Follow
+                            </Button>
+                          )}
+                        </li>
+                      ))}
+                  </ol>
+                </div>
+              </div>
+            </div>
+          )}
+          <div className={classes.photo}>
+            <ImageList rowHeight={160} className={classes.imageList} cols={3}>
+              {data.map((item) => (
+                <ImageListItem key={item._id} cols={item.cols || 1}>
+                  <img src={item.photo} alt={item.title} />
+                </ImageListItem>
+              ))}
+            </ImageList>
+          </div>
+        </>
+      ) : (
+        <div class="loader"></div>
       )}
-      <div className={classes.photo}>
-        <ImageList rowHeight={160} className={classes.imageList} cols={3}>
-          {data.map((item) => (
-            <ImageListItem key={item._id} cols={item.cols || 1}>
-              <img src={item.photo} alt={item.title} />
-            </ImageListItem>
-          ))}
-        </ImageList>
-      </div>
     </div>
   );
 };

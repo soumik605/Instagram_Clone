@@ -13,6 +13,7 @@ import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Link, useHistory } from "react-router-dom";
 import { Button } from "@material-ui/core";
+import "../CSS/loadingStyle.css";
 
 import { useAlert } from "react-alert";
 
@@ -264,154 +265,163 @@ export default function Explore() {
 
   return (
     <div className={classes.root}>
-      <div
-        style={{ whiteSpace: "nowrap", overflow: "auto", marginTop: "30px" }}
-      >
-        <div style={{ display: "inline-block" }}>
-          <h4>Suggestions</h4>
-          {alluser.map((user) => {
-            return (
-              state._id !== user._id && (
-                <Card className={classes.usercard} key={user._id}>
-                  <CardContent style={{ textAlign: "center" }}>
-                    <Avatar
-                      alt="SRemy Sharp"
-                      src="/static/images/avatar/1.jpg"
-                      style={{ margin: "auto" }}
-                    />
-                    <Link
-                      to={`/profile/${user._id}`}
-                      style={{
-                        textDecoration: "none",
-                        color: "white",
-                      }}
-                    >
-                      {user.name}
-                    </Link>
-                  </CardContent>
-                  <CardActions style={{ justifyContent: "center" }}>
-                    {user.followers.includes(state._id) ? (
-                      <Button size="small" onClick={() => unfollowUser(user)}>
-                        Unfollow
-                      </Button>
-                    ) : state.followers.includes(user._id) ? (
-                      <Button size="small" onClick={() => followUser(user)}>
-                        Follow Back
-                      </Button>
-                    ) : (
-                      <Button size="small" onClick={() => followUser(user)}>
-                        Follow
-                      </Button>
-                    )}
-                  </CardActions>
-                </Card>
-              )
-            );
-          })}
+      {alluser ? (
+        <div
+          style={{ whiteSpace: "nowrap", overflow: "auto", marginTop: "30px" }}
+        >
+          <div style={{ display: "inline-block" }}>
+            <h4>Suggestions</h4>
+            {alluser.map((user) => {
+              return (
+                state._id !== user._id && (
+                  <Card className={classes.usercard} key={user._id}>
+                    <CardContent style={{ textAlign: "center" }}>
+                      <Avatar
+                        alt="SRemy Sharp"
+                        src="/static/images/avatar/1.jpg"
+                        style={{ margin: "auto" }}
+                      />
+                      <Link
+                        to={`/profile/${user._id}`}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                        }}
+                      >
+                        {user.name}
+                      </Link>
+                    </CardContent>
+                    <CardActions style={{ justifyContent: "center" }}>
+                      {user.followers.includes(state._id) ? (
+                        <Button size="small" onClick={() => unfollowUser(user)}>
+                          Unfollow
+                        </Button>
+                      ) : state.followers.includes(user._id) ? (
+                        <Button size="small" onClick={() => followUser(user)}>
+                          Follow Back
+                        </Button>
+                      ) : (
+                        <Button size="small" onClick={() => followUser(user)}>
+                          Follow
+                        </Button>
+                      )}
+                    </CardActions>
+                  </Card>
+                )
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div class="loader"></div>
+      )}
 
-      {data.map((item) => {
-        const posttime1 = new Date(item.createdAt);
-        const posttime = posttime1.toString();
-        return (
-          <Card className={classes.root} key={item._id}>
-            <CardHeader
-              avatar={
-                <Avatar aria-label="recipe" className={classes.avatar}>
-                  R
-                </Avatar>
-              }
-              title={
-                <Link
-                  to={
-                    item.postedBy._id === state._id
-                      ? `/profile`
-                      : `/profile/${item.postedBy._id}`
-                  }
-                  style={{
-                    textDecoration: "none",
-                    color: "black",
-                  }}
+      {data ? (
+        data.map((item) => {
+          const posttime1 = new Date(item.createdAt);
+          const posttime = posttime1.toString();
+          return (
+            <Card className={classes.root} key={item._id}>
+              <CardHeader
+                avatar={
+                  <Avatar aria-label="recipe" className={classes.avatar}>
+                    R
+                  </Avatar>
+                }
+                title={
+                  <Link
+                    to={
+                      item.postedBy._id === state._id
+                        ? `/profile`
+                        : `/profile/${item.postedBy._id}`
+                    }
+                    style={{
+                      textDecoration: "none",
+                      color: "black",
+                    }}
+                  >
+                    {item.postedBy.name}
+                  </Link>
+                }
+                subheader={posttime}
+              />
+
+              {state._id !== item.postedBy._id &&
+              state.followings.includes(item.postedBy._id) ? (
+                <Button
+                  style={{ float: "right" }}
+                  onClick={() => unfollowUser(item.postedBy)}
                 >
-                  {item.postedBy.name}
-                </Link>
-              }
-              subheader={posttime}
-            />
-            {state.followings.includes(item.postedBy._id) ? (
-              <Button
-                style={{ float: "right" }}
-                onClick={() => unfollowUser(item.postedBy)}
-              >
-                Following
-              </Button>
-            ) : (
-              <Button
-                style={{ float: "right" }}
-                onClick={() => followUser(item.postedBy)}
-              >
-                Follow
-              </Button>
-            )}
-
-            <CardContent>
-              {item.postedBy._id === state._id && (
+                  Following
+                </Button>
+              ) : state._id !== item.postedBy._id ? (
+                <Button
+                  style={{ float: "right" }}
+                  onClick={() => followUser(item.postedBy)}
+                >
+                  Follow
+                </Button>
+              ) : (
                 <DeleteIcon
                   style={{ float: "right" }}
                   onClick={() => deletePost(item._id)}
                 />
               )}
+              <CardContent>
+                <h3 style={{ fontFamily: "Rock Salt" }}>{item.title}</h3>
+              </CardContent>
+              <CardMedia
+                className={classes.media}
+                image={item.photo}
+                title={item.postedBy.name}
+              />
+              <CardContent>
+                <h3>Desc : {item.desc}</h3>
+              </CardContent>
+              <CardActions disableSpacing>
+                {item.likes.includes(state._id) ? (
+                  <ThumbDownIcon onClick={() => unlikePost(item._id)} />
+                ) : (
+                  <ThumbUpIcon onClick={() => likePost(item._id)} />
+                )}
 
-              <h3 style={{ fontFamily: "Rock Salt" }}>{item.title}</h3>
-            </CardContent>
-            <CardMedia
-              className={classes.media}
-              image={item.photo}
-              title={item.postedBy.name}
-            />
-            <CardContent>
-              <h3>Desc : {item.desc}</h3>
-            </CardContent>
-            <CardActions disableSpacing>
-              {item.likes.includes(state._id) ? (
-                <ThumbDownIcon onClick={() => unlikePost(item._id)} />
-              ) : (
-                <ThumbUpIcon onClick={() => likePost(item._id)} />
-              )}
+                <h3>{item.likes.length} Likes</h3>
+              </CardActions>
+              {item.comments.map((comment) => {
+                return (
+                  <h5 key={comment._id}>
+                    <span style={{ fontWeight: 400 }}>
+                      {comment.postedBy.name} -{" "}
+                    </span>
+                    <span>{comment.text}</span>
 
-              <h3>{item.likes.length} Likes</h3>
-            </CardActions>
-            {item.comments.map((comment) => {
-              return (
-                <h5 key={comment._id}>
-                  <span style={{ fontWeight: 400 }}>
-                    {comment.postedBy.name} -{" "}
-                  </span>
-                  <span>{comment.text}</span>
+                    <span>
+                      {comment.postedBy._id === state._id && (
+                        <DeleteIcon
+                          style={{ float: "right" }}
+                          onClick={() => deleteComment(item._id, comment._id)}
+                        />
+                      )}
+                    </span>
+                  </h5>
+                );
+              })}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  makeComment(e.target[0].value, item._id);
+                }}
+              >
+                <input type="text" placeholder="Add a comment.." />
+              </form>
+            </Card>
+          );
+        })
+      ) : (
+        <div class="loader"></div>
+      )}
 
-                  <span>
-                    {comment.postedBy._id === state._id && (
-                      <DeleteIcon
-                        style={{ float: "right" }}
-                        onClick={() => deleteComment(item._id, comment._id)}
-                      />
-                    )}
-                  </span>
-                </h5>
-              );
-            })}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                makeComment(e.target[0].value, item._id);
-              }}
-            >
-              <input type="text" placeholder="Add a comment.." />
-            </form>
-          </Card>
-        );
-      })}
+      
     </div>
   );
 }
